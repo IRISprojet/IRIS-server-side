@@ -17,7 +17,7 @@ const path = require("path");
 const multer = require("multer");
 
 const { spawn } = require("child_process");
-const chatModel = require("../models/chat.model");
+
 
 const register = async (req, res) => {
   try {
@@ -80,11 +80,11 @@ const register = async (req, res) => {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRATION,
     });
 
-    //create a new chat with for this user
-    const chat = new chatModel({
-      user: NEW_USER._id,
-    });
-    const NEW_CHAT = await chat.save();
+    // //create a new chat with for this user
+    // const chat = new chatModel({
+    //   user: NEW_USER._id,
+    // });
+    // const NEW_CHAT = await chat.save();
     res.status(201).send({
       message: "User created successfully, please verify your email!",
       accessToken: accessToken,
@@ -778,7 +778,7 @@ const addClaim = async (req, res) => {
   const { claimName, userEmail, subject, message } = req.body;
 
   try {
-    const user = await evuserModel.findOne({ email: userEmail });
+    const user = await userModel.findOne({ email: userEmail });
     if (!user) {
       return res.status(404).json({
         success: false,

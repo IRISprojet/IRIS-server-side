@@ -23,7 +23,7 @@ const {
   setTfaTypeToFaceId,
   setTfaTypeToAuthenticator,
   setTfaTypeToEmail,
-  addClaim,
+  
  
   logout,
   refreshToken,
@@ -79,98 +79,97 @@ router.post('/setMfaTrue', setMfaTrue);
 router.post('/setTfaTypeToFaceId', isAuth, setTfaTypeToFaceId);
 router.post('/setTfaTypeToAuthenticator', isAuth, setTfaTypeToAuthenticator);
 router.post('/setTfaTypeToEmail', isAuth, setTfaTypeToEmail);
-router.post("/addClaim", addClaim);
 
 //
 
-// Passport JS CONFIG
-var GoogleStrategy = require("passport-google-oauth2").Strategy;
-var GitHubStrategy = require("passport-github2").Strategy;
-const passport = require("passport");
-const { verify } = require("jsonwebtoken");
-var userProfile = null;
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_OAUTH_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_OAUTH_CALLBACK_URL,
-      scope: ["email", "profile"],
-    },
-    function (accessToken, refreshToken, profile, done) {
-      userProfile = profile;
-      return done(null, userProfile);
-    }
-  )
-);
-passport.use(
-  new GitHubStrategy(
-    {
-      clientID: process.env.GITHUB_OAUTH_CLIENT_ID,
-      clientSecret: process.env.GITHUB_OAUTH_CLIENT_SECRET,
-      callbackURL: process.env.GITHUB_OAUTH_CALLBACK_URL,
-      scope: ["user:email"],
-    },
-    function (accessToken, refreshToken, profile, done) {
-      userProfile = profile;
-      return done(null, profile);
-    }
-  )
-);
-passport.serializeUser(function (user, cb) {
-  cb(null, user);
-});
-passport.deserializeUser(function (obj, cb) {
-  cb(null, obj);
-});
+// // Passport JS CONFIG
+// var GoogleStrategy = require("passport-google-oauth2").Strategy;
+// var GitHubStrategy = require("passport-github2").Strategy;
+// const passport = require("passport");
+// const { verify } = require("jsonwebtoken");
+// var userProfile = null;
+// passport.use(
+//   new GoogleStrategy(
+//     {
+//       clientID: process.env.GOOGLE_OAUTH_CLIENT_ID,
+//       clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+//       callbackURL: process.env.GOOGLE_OAUTH_CALLBACK_URL,
+//       scope: ["email", "profile"],
+//     },
+//     function (accessToken, refreshToken, profile, done) {
+//       userProfile = profile;
+//       return done(null, userProfile);
+//     }
+//   )
+// );
+// passport.use(
+//   new GitHubStrategy(
+//     {
+//       clientID: process.env.GITHUB_OAUTH_CLIENT_ID,
+//       clientSecret: process.env.GITHUB_OAUTH_CLIENT_SECRET,
+//       callbackURL: process.env.GITHUB_OAUTH_CALLBACK_URL,
+//       scope: ["user:email"],
+//     },
+//     function (accessToken, refreshToken, profile, done) {
+//       userProfile = profile;
+//       return done(null, profile);
+//     }
+//   )
+// );
+// passport.serializeUser(function (user, cb) {
+//   cb(null, user);
+// });
+// passport.deserializeUser(function (obj, cb) {
+//   cb(null, obj);
+// });
 
-// GOOGLE OAUTH
-router.get("/google", passport.authenticate("google"));
-router.get(
-  "/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: "/login/failed",
-  }),
-  function (req, res) {
-    let prevSession = req.session;
-    req.session.regenerate((err) => {
-      Object.assign(req.session, prevSession);
-      res.redirect("/api/user/google/success");
-    });
-  }
-);
-router.get(
-  "/google/success",
-  [
-    (req, res, next) => {
-      req.profile = userProfile;
-      next();
-    },
-  ],
-  googleCallback
-);
-// GITHUB OAUTH
-router.get("/github", passport.authenticate("github"));
-router.get(
-  "/github/callback",
-  passport.authenticate("github", { failureRedirect: "/login/error" }),
-  function (req, res) {
-    let prevSession = req.session;
-    req.session.regenerate((err) => {
-      Object.assign(req.session, prevSession);
-      res.redirect("/api/user/github/success");
-    });
-  }
-);
-router.get(
-  "/github/success",
-  [
-    (req, res, next) => {
-      req.profile = userProfile;
-      next();
-    },
-  ],
-  githubCallback
-);
+// // GOOGLE OAUTH
+// router.get("/google", passport.authenticate("google"));
+// router.get(
+//   "/google/callback",
+//   passport.authenticate("google", {
+//     failureRedirect: "/login/failed",
+//   }),
+//   function (req, res) {
+//     let prevSession = req.session;
+//     req.session.regenerate((err) => {
+//       Object.assign(req.session, prevSession);
+//       res.redirect("/api/user/google/success");
+//     });
+//   }
+// );
+// router.get(
+//   "/google/success",
+//   [
+//     (req, res, next) => {
+//       req.profile = userProfile;
+//       next();
+//     },
+//   ],
+//   googleCallback
+// );
+// // GITHUB OAUTH
+// router.get("/github", passport.authenticate("github"));
+// router.get(
+//   "/github/callback",
+//   passport.authenticate("github", { failureRedirect: "/login/error" }),
+//   function (req, res) {
+//     let prevSession = req.session;
+//     req.session.regenerate((err) => {
+//       Object.assign(req.session, prevSession);
+//       res.redirect("/api/user/github/success");
+//     });
+//   }
+// );
+// router.get(
+//   "/github/success",
+//   [
+//     (req, res, next) => {
+//       req.profile = userProfile;
+//       next();
+//     },
+//   ],
+//   githubCallback
+// );
 
 module.exports = router;

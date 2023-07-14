@@ -8,17 +8,9 @@ const cookieParser = require("cookie-parser");
 const cookieEncrypter = require("cookie-encrypter");
 // Import Routes
 const userRoute = require("./routes/user.route");
+
 const adminRoute = require("./routes/admin.route");
 const { isAuth, isAdmin } = require("./middleware");
-const elearningRoute = require("./routes/course.route");
-const courseCategoryRoute = require("./routes/courseCategory.route");
-const forumRoute = require("./routes/forum.route");
-const commentRoute = require("./routes/comment.route");
-const likeRoute = require("./routes/like.route");
-const conversationRoute = require("./routes/conversation.route");
-const messageRoute = require("./routes/message.route");
-const notificationRoute = require("./routes/notification.route");
-
 const app = express();
 app.use(
   session({
@@ -54,26 +46,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 // Route MiddleWares
 app.use("/api/user", userRoute);
-//only authenticated user can access this route
+
 //only admin can access this route
 app.use("/api/admin", adminRoute);
 
-// E-learning Routes
-app.use("/api/course", isAuth, elearningRoute);
-// course category routes
-app.use("/api/category", isAuth, courseCategoryRoute);
-
-//forum route
-app.use("/api/post", forumRoute);
-//forum route
-app.use("/api/comment", commentRoute);
-//like route
-app.use("/api/like", likeRoute);
-//conversation route
-app.use("/api/conversation", isAuth, conversationRoute);
-//message route
-app.use("/api/message", isAuth, messageRoute);
-//notification route
-app.use("/api/notification", isAuth, notificationRoute);
 
 module.exports = app;
