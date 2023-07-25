@@ -1,5 +1,8 @@
 const http = require("http");
 const app = require("./src/app");
+const socket = require("./socket");
+const redisClient = require("./redis");
+const userModel = require("./src/models/user.model"); // import our user model
 
 // return the port in the right format
 const normalizePort = (val) => {
@@ -46,7 +49,31 @@ server.on("listening", () => {
   console.log("Listening on " + bind);
 });
 
- server.listen(port);
-  
+try {
+  const appServer = server.listen(port);
+  const io = socket.init(appServer);
+  io.on("connection", (socket) => {
+    // require chat socket
+    require("./src/sockets/index")(socket);
 
-
+    // save socket id with user id in redis
+    socket.on("saveSocketId", async (data) => {
+      redisClient.hSet("online users", data.userId, socket.id);
+      // change user status to online
+      await userModel.findByIdAndUpdate(data.userId, { status: "online" });
+    });
+    // disconnect
+    socket.on("disconnect", async () => {
+      const users = await redisClient.hGetAll("online users");
+      for (let key in users) {
+        if (users[key] === socket.id) {
+          await redisClient.hDel("online users", key);
+          // change user status to offline
+          await userModel.findByIdAndUpdate(key, { status: "offline" });
+        }
+      }
+    });
+  });
+} catch (error) {
+  console.log(error);
+}

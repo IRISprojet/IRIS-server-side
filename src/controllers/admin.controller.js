@@ -16,11 +16,11 @@ const registerAdmin = async (req, res) => {
         message: "This Email already Added!",
       });
     } else {
+          // hashing Password
       const newAdmin = new userModel({
-        displayName: req.body.name,
+        displayName: req.body.displayName,
         email: req.body.email,
-        role: req.body.role.toLowerCase(),
-        password: bcrypt.hashSync(req.body.data.password),
+        password: req.body.password,
       });
       const admin = await newAdmin.save();
       const token = signInToken(admin);
@@ -45,10 +45,10 @@ const registerAdmin = async (req, res) => {
         _id: admin._id,
         name: admin.displayName,
         email: admin.email,
-        role: admin.role.toLowerCase(),
         joiningDate: Date.now(),
       });
     }
+    
   } catch (err) {
     res.status(500).json({ success: false, error: "Please Try Again" });
   }

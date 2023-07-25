@@ -1,6 +1,7 @@
 "use strict";
 
 const userModel = require("../models/user.model"); // import our user model
+const deviceModel = require("../models/device.model"); // import our user model
 const bcrypt = require("bcryptjs"); // used to hash and unhash password to register and login
 const { registerValidation, loginValidation } = require("../utils/validation"); // import our constraints on user
 const tfaModel = require("../models/tfa");
@@ -15,9 +16,9 @@ const fs = require("fs");
 const axios = require("axios");
 const path = require("path");
 const multer = require("multer");
-
+//eya
 const { spawn } = require("child_process");
-
+const chatModel = require("../models/chat.model");
 
 const register = async (req, res) => {
   try {
@@ -62,7 +63,7 @@ const register = async (req, res) => {
       to: `${req.body.email}`,
       subject: "Activation de compte",
       html: `<h2>Hello ${req.body.displayName}</h2>
-      <p>Vérifier votre compte pour continuer à utiliser votre compte <strong>Esprit Community</strong>.</p>
+      <p>Vérifier votre compte pour continuer à utiliser votre compte <strong>IRIs</strong>.</p>
 
         <p>Ce lien va expirer dans <strong> 15 minutes</strong>.</p>
 
@@ -71,7 +72,7 @@ const register = async (req, res) => {
         <a href=http://localhost:3000/verify-account/${TOKEN} style="background:#22c55e;color:white;border:1px solid #22c55e; padding: 10px 15px; border-radius: 4px; text-decoration:none;">Vérifier votre compte</a>
 
         <p style="margin-bottom:0px;">Merci!</p>
-        <strong>Esprit Community Team</strong>
+        <strong>Iris</strong>
              `,
     };
 
@@ -80,11 +81,11 @@ const register = async (req, res) => {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRATION,
     });
 
-    // //create a new chat with for this user
-    // const chat = new chatModel({
-    //   user: NEW_USER._id,
-    // });
-    // const NEW_CHAT = await chat.save();
+    //create a new chat with for this user
+    const chat = new chatModel({
+      user: NEW_USER._id,
+    });
+    const NEW_CHAT = await chat.save();
     res.status(201).send({
       message: "User created successfully, please verify your email!",
       accessToken: accessToken,
@@ -123,7 +124,35 @@ const login = async (req, res) => {
       return res.status(401).send({ message: "Invalid credentials!" });
     }
 
+    const Device = await deviceModel.findOne({
+      visitorId: req.body.data.visitorId,
+      user: user._id,
+    });
     let refreshToken;
+    // if device not exist, new device
+    if (Device == null) {
+      refreshToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRATION,
+      });
+      await deviceModel.create({
+        visitorId: req.body.data.visitorId,
+        user: user._id,
+        refreshToken: refreshToken,
+      });
+    }
+    // if device exist
+    else {
+      try {
+        jwt.verify(Device.refreshToken, process.env.JWT_SECRET);
+        refreshToken = Device.refreshToken;
+      } catch (error) {
+        refreshToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+          expiresIn: process.env.REFRESH_TOKEN_EXPIRATION,
+        });
+        Device.refreshToken = refreshToken;
+        await Device.save();
+      }
+    }
 
     // final response in case tfa enabled
     if (user.TFA) {
@@ -167,7 +196,12 @@ const refreshToken = async (req, res) => {
     if (!refreshToken) {
       return res.status(401).send({ message: "Unauthorized" });
     }
-   
+    const Device = await deviceModel.findOne({
+      visitorId: req?.query?.visitorId,
+    });
+    if (Device == null) {
+      return res.status(401).send({ message: "Unauthorized" });
+    }
     const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
     const user = await userModel.findById(decoded._id);
     if (!user) {
@@ -203,7 +237,28 @@ const logout = async (req, res) => {
   }
 };
 
+const getUser = async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user._id);
+    if (!user) {
+      return res.status(404).send({ message: "user not found" });
+    }
+    // search for device
+    const Device = await deviceModel.findOne({
+      visitorId: req.query.visitorId,
+      user: user._id,
+    });
+    // if device not exist, kick user out
+    if (Device == null) {
+      return res.status(401).send({ message: "Unauthorized" });
+    }
 
+    // if device exist
+    res.status(200).send({ user: user });
+  } catch (err) {
+    res.status(500).send({ message: "something went wrong" });
+  }
+};
 
 const tfa_setup = async (req, res) => {
   try {
@@ -218,9 +273,9 @@ const tfa_setup = async (req, res) => {
       tempSecret: code,
     });
     await sendEmail({
-      from: "Iris team",
+      from: "esprit community",
       to: USER.email,
-      subject: "Verify your identity | esprit Iris team",
+      subject: "Verify your identity | esprit community",
       text: `Hello ${USER.displayName}, please use this code to verify your identity: ${code}`,
     });
     res.status(200).send({ message: "email sent successfully" });
@@ -412,6 +467,7 @@ const signIn = async (user, req, res) => {
   } catch (error) {}
 };
 
+//feriel
 
 const sendPasswordResetEmail = async (req, res) => {
   try {
@@ -778,7 +834,7 @@ const addClaim = async (req, res) => {
   const { claimName, userEmail, subject, message } = req.body;
 
   try {
-    const user = await userModel.findOne({ email: userEmail });
+    const user = await evuserModel.findOne({ email: userEmail });
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -949,7 +1005,7 @@ const setTfaTypeToEmail = async (req, res) => {
 module.exports = {
   register,
   login,
-
+  getUser,
   tfa_setup,
   tfa_verify,
   google_tfaVerify,
@@ -963,7 +1019,8 @@ module.exports = {
   verifyAccount,
   resend_verification_email,
   checkPasswordResetToken,
-  
+  //eya
+  loginWithFace,
   updateUser,
   deleteUser,
   getUserProfile,

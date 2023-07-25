@@ -14,14 +14,14 @@ const schema = new Schema(
     email: { type: String, required: true },
     password: { type: String, required: true },
     isVerified: { type: Boolean, default: false },
-    from: { type: String, default: "Iris team" },
+    from: { type: String, default: "Esprit Community" },
     photoURL: { type: String, required: false },
     isBanned: { type: Boolean, default: false },
     phone: { type: String, required: false },
     TFA: { type: Boolean, default: false },
     TFA_type: {
       type: String,
-      enum: ["email", "authenticator", "mfa"],
+      enum: ["email", "authenticator", "face_id", "mfa"],
       default: "mfa",
     },
     status: {

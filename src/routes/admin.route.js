@@ -23,7 +23,7 @@ const { isAuth, isAdmin } = require("../middleware");
 //routes
 
 //register a staff
-router.post("/register", registerAdmin);
+router.post("/register", isAuth, isAdmin , registerAdmin);
 
 //login a admin
 router.post("/login", loginAdmin);
@@ -53,6 +53,7 @@ router.put("/:id", uploadCloudinary.single('profilePicture'), isAuth, isAdmin, u
 router.delete("/:id", isAuth, isAdmin, deleteStaff);
 
 router.put("/ban/:id", isAuth, isAdmin, changeIsBanned);
+
 
 
 
