@@ -4,17 +4,17 @@ const router = express.Router();
 const { isAdmin ,isAuth } = require("../middleware");
 // import controller register
 const {
-    addPostule,getPostulesByinternship,updatedPostule
+    addPostule,getPostulesByInternship,updatedPostule
  
 } = require("../controllers/postuler.controller");
 
 
-
+router.get('/:internshipId', isAuth, getPostulesByInternship);
 
 router.post('/:internshipId', isAuth, addPostule);
 //router.put('/:likeId', isAuth, updatedPostule);
 //router.delete('/:likeId', isAuth, deleteLike);
-router.get('/:internshipId', isAuth, getPostulesByinternship);
+
 
 
 

@@ -118,13 +118,19 @@ exports.addPostule = async (req, res) => {
 
 
 
-exports.getPostulesByinternship = async (req, res) => {
-  try {
-    const { postId } = req.params;
-    const postules = await Postuler.find({ postuler: postId }).populate("user");
-    res.json(postules);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error getting likes" });
-  }
-};
+exports.getPostulesByInternship = async (req, res) => {
+    try {
+      const { postId } = req.params;
+      const postules = await Postuler.find({ postuler: postId })
+      .populate({
+        path: 'internship',
+        model: 'Internship', // Make sure to use the correct model name
+      })
+        .populate("user");
+
+      res.json(postules);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Error getting postules" });
+    }
+  };

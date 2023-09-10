@@ -11,7 +11,7 @@ const InternshipSchema = new Schema({
   description: { type: String, required: false },
   category: { type: Schema.Types.ObjectId, ref: "Category", required: false }, // Reference the Category model
   duration: { type: Number, required: false },
-  
+  photoURL: { type: String, required: false },
   
   creator: {
     type: mongoose.Schema.Types.ObjectId,
