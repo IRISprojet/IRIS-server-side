@@ -106,6 +106,7 @@ const addForum = async (req, res) => {
 // Get all forums
 const getAllForums = async (req, res) => {
   try {
+  
     const posts = await Post.find()
       .populate({
         path: "comments",
@@ -126,6 +127,7 @@ const getAllForums = async (req, res) => {
         },
       })
       .sort({ time: -1 });
+      
 
     res.status(200).send(posts);
   } catch (error) {
@@ -137,8 +139,9 @@ const getAllForums = async (req, res) => {
 // Get by id
 const getForum = async (req, res) => {
   try {
+   
     const PostId = req.params.id;
-    const post = await Post.findById(PostId)
+    const post = await Post.findOne(PostId )
       .populate({
         path: "comments",
         populate: {

@@ -12,6 +12,7 @@ const {
   getAllCategory,
   updateCourseProgress,
   getCoursebylevel,
+  getCoursebycreator
 } = require("../controllers/Internship.controller");
 
 //Courses
@@ -19,7 +20,8 @@ router.post("/", addCourse);
 router.put("/:id", updateCourse);
 router.delete("/:id", deleteCourse);
 router.get("/", getAllCourses);
-router.get("/level/:level", getCoursebylevel);
+router.get("/type/:type", getCoursebylevel);
+router.get("/creator/:cretor", getCoursebycreator);
 router.get("/category", getAllCategory);
 router.get("/:id", getCourse);
 

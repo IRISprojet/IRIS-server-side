@@ -17,6 +17,7 @@ const InternshipCategoryRoute = require("./routes/InternshipCategory.route");
 const forumRoute = require("./routes/forum.route");
 const commentRoute = require("./routes/comment.route");
 const likeRoute = require("./routes/like.route");
+const appliedRoute = require ("./routes/postule.route")
 const conversationRoute = require("./routes/conversation.route");
 const messageRoute = require("./routes/message.route");
 const notificationRoute = require("./routes/notification.route");
@@ -75,6 +76,9 @@ app.use("/api/post", forumRoute);
 app.use("/api/comment", commentRoute);
 //like route
 app.use("/api/like", likeRoute);
+//applied to internship
+app.use("/api/applied", appliedRoute);
+
 //conversation route
 app.use("/api/conversation", isAuth, conversationRoute);
 //message route

@@ -130,10 +130,32 @@ const getCourse = async (req, res) => {
 };
 const getCoursebylevel = async (req, res) => {
   try {
-    const level = req.params.level;
+    const type = req.params.type;
     let courses;
-    if (level) {
-      courses = await Course.find({ level: parseInt(level) })
+    if (type) {
+      courses = await Course.find({ type })
+        .populate("category")
+        .lean();
+    } else {
+      courses = await Course.find().lean();
+    }
+    console.log(courses);
+    courses.forEach((item) => {
+      item.id = item._id;
+    });
+    res.status(200).send(courses);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: "Something went wrong!" });
+  }
+};
+
+const getCoursebycreator = async (req, res) => {
+  try {
+    const creator = req.params.creator;
+    let courses;
+    if (creator) {
+      courses = await Course.find({ creator })
         .populate("category")
         .lean();
     } else {
@@ -229,4 +251,5 @@ module.exports = {
   getAllCategory,
   updateCourseProgress,
   getCoursebylevel,
+  getCoursebycreator,
 };
